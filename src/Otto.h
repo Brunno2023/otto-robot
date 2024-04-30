@@ -1,6 +1,7 @@
-#ifndef Otto_h
-#define Otto_h
+#ifndef OTTO_H
+#define OTTO_H
 
+#include <Arduino.h>
 #ifdef ARDUINO_ARCH_ESP32
 #include <ESP32Servo.h>
 #else
@@ -13,83 +14,91 @@
 #include "Otto_mouths.h"
 #include "Otto_matrix.h"
 
+// Guard clause to prevent multiple inclusions of the same header file
+#if defined(OTTO_H) && !defined(OTTO_IMPLEMENTATION)
+#error "You cannot include 'Otto.h' directly, include 'Otto.cpp' instead."
+#endif
+
 //-- Constants
-#define FORWARD     1
-#define BACKWARD    -1
-#define LEFT        1
-#define RIGHT       -1
-#define SMALL       5
-#define MEDIUM      15
-#define BIG         30
+#define FORWARD 1
+#define BACKWARD -1
+#define LEFT 1
+#define RIGHT -1
+#define SMALL 5
+#define MEDIUM 15
+#define BIG 30
 
 // -- Servo delta limit default. degree / sec
 #define SERVO_LIMIT_DEFAULT 240
 
 class Otto
 {
-  public:
+public:
+    // Constructor
+    Otto(int YL, int YR, int RL, int RR, bool load_calibration, int Buzzer);
 
-    //-- Otto initialization
-    void init(int YL, int YR, int RL, int RR, bool load_calibration, int Buzzer);
-    //-- Attach & detach functions
+    // Otto initialization
+    void init();
+
+    // Attach & detach functions
     void attachServos();
     void detachServos();
 
-    //-- Oscillator Trims
+    // Oscillator Trims
     void setTrims(int YL, int YR, int RL, int RR);
     void saveTrimsOnEEPROM();
 
-    //-- Predetermined Motion Functions
-    void _moveServos(int time, int  servo_target[]);
-    void _moveSingle(int position,int  servo_number);
+    // Predetermined Motion Functions
+    void _moveServos(int time, int servo_target[]);
+    void _moveSingle(int position, int servo_number);
     void oscillateServos(int A[4], int O[4], int T, double phase_diff[4], float cycle);
 
-    //-- HOME = Otto at rest position
+    // HOME = Otto at rest position
     void home();
     bool getRestState();
     void setRestState(bool state);
 
-    //-- Predetermined Motion Functions
-    void jump(float steps=1, int T = 2000);
+    // Predetermined Motion Functions
+    void jump(float steps = 1, int T = 2000);
 
-    void walk(float steps=4, int T=1000, int dir = FORWARD);
-    void turn(float steps=4, int T=2000, int dir = LEFT);
-    void bend (int steps=1, int T=1400, int dir=LEFT);
-    void shakeLeg (int steps=1, int T = 2000, int dir=RIGHT);
+    void walk(float steps = 4, int T = 1000, int dir = FORWARD);
+    void turn(float steps = 4, int T = 2000, int dir = LEFT);
+    void bend(int steps = 1, int T = 1400, int dir = LEFT);
+    void shakeLeg(int steps = 1, int T = 2000, int dir = RIGHT);
 
-    void updown(float steps=1, int T=1000, int h = 20);
-    void swing(float steps=1, int T=1000, int h=20);
-    void tiptoeSwing(float steps=1, int T=900, int h=20);
-    void jitter(float steps=1, int T=500, int h=20);
-    void ascendingTurn(float steps=1, int T=900, int h=20);
+    void updown(float steps = 1, int T = 1000, int h = 20);
+    void swing(float steps = 1, int T = 1000, int h = 20);
+    void tiptoeSwing(float steps = 1, int T = 900, int h = 20);
+    void jitter(float steps = 1, int T = 500, int h = 20);
+    void ascendingTurn(float steps = 1, int T = 900, int h = 20);
 
-    void moonwalker(float steps=1, int T=900, int h=20, int dir=LEFT);
-    void crusaito(float steps=1, int T=900, int h=20, int dir=FORWARD);
-    void flapping(float steps=1, int T=1000, int h=20, int dir=FORWARD);
+    void moonwalker(float steps = 1, int T = 900, int h = 20, int dir = LEFT);
+    void crusaito(float steps = 1, int T = 900, int h = 20, int dir = FORWARD);
+    void flapping(float steps = 1, int T = 1000, int h = 20, int dir = FORWARD);
 
-    //-- Mouth & Animations
+    // Mouth & Animations
     void putMouth(unsigned long int mouth, bool predefined = true);
     void putAnimationMouth(unsigned long int anim, int index);
     void clearMouth();
 
-    //-- Sounds
-    void _tone (float noteFrequency, long noteDuration, int silentDuration);
-    void bendTones (float initFrequency, float finalFrequency, float prop, long noteDuration, int silentDuration);
+    // Sounds
+    void _tone(float noteFrequency, long noteDuration, int silentDuration);
+    void bendTones(float initFrequency, float finalFrequency, float prop, long noteDuration, int silentDuration);
     void sing(int songName);
 
-    //-- Gestures
+    // Gestures
     void playGesture(int gesture);
     void initMATRIX(int DIN, int CS, int CLK, int rotate);
     void matrixIntensity(int intensity);
     void setLed(byte X, byte Y, byte value);
-    void writeText (const char * s, byte scrollspeed);
+    void writeText(const char *s, byte scrollspeed);
 
-    // -- Servo limiter
+    // Servo limiter
     void enableServoLimit(int speed_limit_degree_per_sec = SERVO_LIMIT_DEFAULT);
     void disableServoLimit();
 
-  private:
-
+private:
+    // Member variables
     Oscillator servo[4];
     Otto_Matrix ledmatrix;
     int servo_pins[4];
@@ -103,10 +112,24 @@ class Otto
 
     bool isOttoResting;
 
+    // Helper functions
     unsigned long int getMouthShape(int number);
     unsigned long int getAnimShape(int anim, int index);
     void _execute(int A[4], int O[4], int T, double phase_diff[4], float steps);
 
+    // Error checking functions
+    bool isValidServoPin(int pin);
+    bool isValidBuzzerPin(int pin);
+    bool isEEPROMAvailable();
+    bool areServosAttached();
+    bool areTrimsValid(int trims[4]);
+    bool areLimitsValid(int limits[4]);
+    bool isValidAnimationIndex(int index);
+    bool isValidGestureIndex(int index);
+    bool areMatrixPinsValid(int DIN, int CS, int CLK);
+    bool isValidMatrixIntensity(int intensity);
+    bool areMatrixLEDCoordinatesValid(byte X, byte Y);
+    bool isValidMatrixTextScrollSpeed(byte scrollspeed);
 };
 
-#endif
+#endif // OTTO_H

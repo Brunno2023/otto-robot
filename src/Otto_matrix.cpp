@@ -3,19 +3,28 @@
  * Version 1.1 Feb 2023
  * Copyright 2013-2023 Oscar Kin-Chung Au
  * Adapted for OTTO version 9 use
+ *
+ * This code is for a MaxMatrix LED display controller using the Max7219 chip.
+ * It includes initialization, intensity control, clearing the matrix, setting
+ * commands, setting columns, and setting individual dots. Additionally, it has
+ * functions for writing full values to the display, sending characters, and
+ * scrolling text.
  */
 
 #include "Arduino.h"
 #include "Otto_matrix.h"
 
+// Constructor for the Otto_Matrix class
 Otto_Matrix::Otto_Matrix() 
 {
+	// Initialization of member variables
 	//data = _data;
 	//load = _load;
 	//clock = _clock;
 	//num = _num;
 }
 
+// Initialize the MaxMatrix with given parameters
 void Otto_Matrix::init(byte _data, byte _load, byte _clock, byte _num, int _rotation)
 {
   if (_data >= 64 || _load >= 64 || _clock >= 64 || _num > 8 || (_rotation != 1 && _rotation != 2 && _rotation != 3 && _rotation != 4)) {
@@ -58,11 +67,13 @@ void Otto_Matrix::init(byte _data, byte _load, byte _clock, byte _num, int _rota
 	setIntensity(0x0f);    // the first 0x0f is the value you can set
 }
 
+// Set the intensity of the display (0x00 to 0x0f)
 void Otto_Matrix::setIntensity(byte intensity)
 {
 	setCommand(max7219_reg_intensity, intensity);
 }
 
+// Clear the matrix by turning all LEDs off
 void Otto_Matrix::clearMatrix()
 {
 	for (int i=0; i<8; i++) 
@@ -75,6 +86,7 @@ void Otto_Matrix::clearMatrix()
     CHARbuffer[i] = 0;
 }
 
+// Send a command to the Max7219 chip
 void Otto_Matrix::setCommand(byte command, byte value)
 {
 #if defined(ESP32)
@@ -91,7 +103,7 @@ void Otto_Matrix::setCommand(byte command, byte value)
 #endif
 }
 
-
+// Set a specific column of the matrix
 void Otto_Matrix::setColumn(byte col, byte value)
 {
 	int n = col / 8;
@@ -130,6 +142,7 @@ void Otto_Matrix::setColumn(byte col, byte value)
 	buffer[col] = value;
 }
 
+// Set all dots in a column to a specific value
 void Otto_Matrix::setColumnAll(byte col, byte value)
 {
 #if defined(ESP32)
@@ -149,6 +162,7 @@ void Otto_Matrix::setColumnAll(byte col, byte value)
 		buffer[col * i] = value;
 }
 
+// Set a specific dot in the matrix
 void Otto_Matrix::setDot(byte col, byte row, byte value)
 {
     if (col >= 8 || row >= 8) {
@@ -191,7 +205,7 @@ void Otto_Matrix::setDot(byte col, byte row, byte value)
 #endif
 }
 
-// routine for OTTO and ZOWI, for the 6 x 5 matrix
+// Write a full value to the display
 void Otto_Matrix::writeFull(unsigned long value) {
   if (rotation < 1 || rotation > 4) rotation = 1;
   int startCol = 0;
@@ -225,6 +239,7 @@ void Otto_Matrix::writeFull(unsigned long value) {
   }
 }
 
+// Send a character to the display
 void Otto_Matrix::sendChar (const byte data, byte pos, byte number, byte scrollspeed)
 {
   if (scrollspeed < 50 ) scrollspeed = 50;
@@ -286,9 +301,4 @@ void Otto_Matrix::sendChar (const byte data, byte pos, byte number, byte scrolls
                   setDot(c,7-r,(0b00000001 & (value >> r)));//       
                    }
                   if (rotation == 2) {
-                  setDot(7-c,r,(0b00000001 & (value >> r)));//  
-                  }
-                  if (rotation == 3) {
-                   setDot(r,c,(0b00000001 & (value >> r)));//  
-                 }
-                  if (rotation == 4
+                  setDot(7-c,r,(0b00000001 &

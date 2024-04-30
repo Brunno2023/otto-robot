@@ -1,5 +1,7 @@
+from typing import List, Union
+
 # A dictionary of supported funding model platforms
-funding_platforms = {
+funding_platforms: dict[str, Union[str, List[str]]] = {
     "github": [],  # up to 4 GitHub Sponsors-enabled usernames
     "patreon": "",  # a single Patreon username
     "open_collective": "",  # a single Open Collective username

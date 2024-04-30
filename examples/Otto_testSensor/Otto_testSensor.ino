@@ -5,7 +5,6 @@
 //-- Make sure to have installed all libraries: https://github.com/OttoDIY/OttoDIYLib
 //-----------------------------------------------------------------
 
-
 ///////////////////////////////////////////////////////////////////
 //-- Setup ------------------------------------------------------//
 ///////////////////////////////////////////////////////////////////
@@ -15,21 +14,18 @@ void setup() {
 
   pinMode( D5 , OUTPUT);    
   pinMode(2, OUTPUT);
-    tone(  D5,523 ,125);
-   delay(125);
-  tone(  D5, 587 ,125);
-   delay(125);
-  tone(  D5, 659 ,125);
-   delay(125);
-  tone(  D5, 698 ,125);
-   delay(125);
-  tone(  D5, 784 ,125);
-   delay(125);
-  tone(  D5,880,125);
-   delay(125);
-  tone(  D5,261,125);
-   delay(125);
 
+  // Play the startup tone
+  playTone(523, 125);
+  playTone(587, 125);
+  playTone(659, 125);
+  playTone(698, 125);
+  playTone(784, 125);
+  playTone(880, 125);
+  playTone(261, 125);
+
+  // Wait for the serial connection to initialize
+  delay(1000);
 }
 
 ///////////////////////////////////////////////////////////////////
@@ -37,13 +33,25 @@ void setup() {
 ///////////////////////////////////////////////////////////////////
 
 void loop() {
-    digitalWrite(2, LOW);
-    Serial.println("LIGHT:");
-    Serial.print(analogRead(A0));
-    if (1==1) {
-      digitalWrite(2, HIGH);
-      tone(  D5,440,125);
-       delay(125);
-    }
+  digitalWrite(2, LOW);
 
+  Serial.println("LIGHT:");
+  int lightValue = analogRead(A0);
+
+  // Check that the light value is within a reasonable range
+  if (lightValue >= 0 && lightValue <= 1023) {
+    Serial.print(lightValue);
+  }
+
+  digitalWrite(2, HIGH);
+  playTone(440, 125);
+
+  // Add a delay so that the user can see and hear the output more clearly
+  delay(250);
+}
+
+// Helper function to play a tone on pin D5
+void playTone(int frequency, int duration) {
+  tone(D5, frequency, duration);
+  delay(duration);
 }

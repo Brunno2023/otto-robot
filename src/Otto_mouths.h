@@ -1,12 +1,15 @@
-#ifndef Otto_mouths_h
-#define Otto_mouths_h
-
+#ifndef OTTO_MOUTHS_H
+#define OTTO_MOUTHS_H
 
 //***********************************************************************************
 //*********************************MOUTHS DEFINES************************************
 //***********************************************************************************
-const int NUMBER_OF_ELEMENTS = 31;
-const unsigned long int Mouthtable[NUMBER_OF_ELEMENTS] PROGMEM = {
+
+// The number of mouth codes defined
+const int NUM_MOUTHS = 31;
+
+// The mouth codes as binary strings
+const unsigned long int mouthCodes[NUM_MOUTHS] PROGMEM = {
   0b00001100010010010010010010001100, //zero_code
   0b00000100001100000100000100001110, //one_code
   0b00001100010010000100001000011110, //two_code
@@ -38,39 +41,51 @@ const unsigned long int Mouthtable[NUMBER_OF_ELEMENTS] PROGMEM = {
   0b00000100001000011100001000010000, //thunder_code
   0b00000000100001101101010010000000, //culito_code
   0b00000000011110100001100001000000  //angry_code
-} ;
+};
 
-//Mouths sorted by numbers, and after, by happy to sad mouths
-#define zero 				0
-#define one  				1                
-#define two     			      2               
-#define three                    3  
-#define four                     4
-#define five                     5 
-#define six                      6 
-#define seven                    7  
-#define eight                    8 
-#define nine   				9
-#define smile                    10                  
-#define happyOpen      		11  
-#define happyClosed 	           12  
-#define heart      			13
-#define bigSurprise              14  
-#define smallSurprise 		15
-#define tongueOut 			16
-#define vamp1                    17  
-#define vamp2                    18  
-#define lineMouth        	      19
-#define confused                 20  
-#define diagonal       		21          
-#define sad         		     	22
-#define sadOpen 	                	23 
-#define sadClosed 		  	24
-#define okMouth                 25 
-#define xMouth                  26
-#define interrogation           27
-#define thunder		      	28
-#define culito       		    	29
-#define angry 				30  
-               
-#endif
+// Enumeration of mouth constants
+enum MouthConstants {
+  ZERO,
+  ONE,
+  TWO,
+  THREE,
+  FOUR,
+  FIVE,
+  SIX,
+  SEVEN,
+  EIGHT,
+  NINE,
+  SMILE,
+  HAPPY_OPEN,
+  HAPPY_CLOSED,
+  HEART,
+  BIG_SURPRISE,
+  SMALL_SURPRISE,
+  TONGUE_OUT,
+  VAMP1,
+  VAMP2,
+  LINE_MOUTH,
+  CONFUSED,
+  DIAGONAL,
+  SAD,
+  SAD_OPEN,
+  SAD_CLOSED,
+  OK_MOUTH,
+  X_MOUTH,
+  INTERROGATION,
+  THUNDER,
+  CULITO,
+  ANGRY
+};
+
+// Function to get the mouth code as a binary string
+String getMouthCode(MouthConstants mouth) {
+  return String((char*)pgm_read_word(&mouthCodes[mouth]), BIN);
+}
+
+// Function to print the mouth code to the serial monitor
+void printMouthCode(MouthConstants mouth) {
+  Serial.println(getMouthCode(mouth));
+}
+
+#endif // OTTO_MOUTHS_H

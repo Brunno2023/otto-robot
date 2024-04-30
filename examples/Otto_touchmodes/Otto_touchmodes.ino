@@ -9,6 +9,7 @@
 //-----------------------------------------------------------------
 #include <Otto.h>
 Otto Otto;  //This is Otto!
+
 //---------------------------------------------------------
 //-- First step: Make sure the pins for servos are in the right position
 /*             -------- 
@@ -19,142 +20,143 @@ Otto Otto;  //This is Otto!
                ||     ||
 RIGHT FOOT 5 |---     ---| LEFT FOOT 4  
 */
-#define LeftLeg 2 
+#define LeftLeg 2
 #define RightLeg 3
-#define LeftFoot 4 
-#define RightFoot 5 
-#define Buzzer  13 
+#define LeftFoot 4
+#define RightFoot 5
+#define Buzzer 13
 #define Trigger 8 // ultrasonic sensor trigger pin
-#define Echo 9 // ultrasonic sensor echo pin
+#define Echo 9  // ultrasonic sensor echo pin
+#define TouchSensor A0
 
-const int sensorPin = A0;
+const unsigned long kDebounceDelay = 50; // Debounce delay for touch sensor
+unsigned long lastDebounceTime = 0;
+int touchState = HIGH;
+int lastTouchState = HIGH;
 
-  long ultrasound() {
-   long duration, distance;
-   digitalWrite(Trigger,LOW);
-   delayMicroseconds(2);
-   digitalWrite(Trigger, HIGH);
-   delayMicroseconds(10);
-   digitalWrite(Trigger, LOW);
-   duration = pulseIn(Echo, HIGH);
-   distance = duration/58;
-   return distance;
+long ultrasound() {
+  long duration, distance;
+  digitalWrite(Trigger, LOW);
+  delayMicroseconds(2);
+  digitalWrite(Trigger, HIGH);
+  delayMicroseconds(10);
+  digitalWrite(Trigger, LOW);
+  duration = pulseIn(Echo, HIGH);
+  distance = duration / 58;
+  return distance;
 }
+
 int movement = 0;
 boolean izqder = true; // TEMPO: 97 BPM
 bool obstacleDetected = false;
+
 ///////////////////////////////////////////////////////////////////
 //-- Setup ------------------------------------------------------//
 ///////////////////////////////////////////////////////////////////
-void setup(){
+void setup() {
   Otto.init(LeftLeg, RightLeg, LeftFoot, RightFoot, true, Buzzer); //Set the servo pins and Buzzer pin
-  pinMode(sensorPin, INPUT);
-  pinMode(Trigger, OUTPUT); 
+  pinMode(TouchSensor, INPUT_PULLUP);
+  pinMode(Trigger, OUTPUT);
   pinMode(Echo, INPUT);
   Otto.home();
   Otto.sing(S_happy); // a happy Otto :)
 }
-// touch sensor is in "toggle mode", initial value LOW
-// program expects HIGH value for first touch
-// and then expects LOW value for second touch
-// and then again HIGH and LOW etc.
-//
-  int estado = HIGH; //first expected touch value
-  
+
 ///////////////////////////////////////////////////////////////////
 //-- Principal Loop ---------------------------------------------//
 ///////////////////////////////////////////////////////////////////
 void loop() {
-  
-   if (digitalRead(sensorPin) == estado)
-   {
-     if (estado == HIGH)
-     {
-     estado = LOW; //toggle expect value
-     }
-     else
-     {
-      estado = HIGH; //toggle expect value
-     }
-     Otto.sing(S_buttonPushed);
-     movement = movement + 1;
-     delay(500);
-   }
-   if (movement == 1)
-   {
-        if(obstacleDetected){
-          Serial.println("OBJETO DETECTADO"); 
-          Otto.sing(S_OhOoh);
-          
-          if (izqder == true)
-          {
-            Otto.walk(2,1000,-1); 
-            Otto.turn(2,1000,1);//2 steps turning RIGHT   
-            izqder = false;
-          }
-          else
-          {
-            Otto.walk(2,1000,-1); 
-            Otto.turn(2,1000,-1);//2 steps turning LEFT   
-            izqder = true;
-          }
-          
-          //Otto.home(); 
-          delay(50); 
-          obstacleDetector();
-        } 
-        else
-        {
-          Otto.walk(1,500,1); 
-          delay(50);
-          //Otto.home();
-          obstacleDetector();
+  int reading = digitalRead(TouchSensor);
+
+  if (reading != lastTouchState) {
+    lastDebounceTime = millis();
+  }
+
+  if ((millis() - lastDebounceTime) > kDebounceDelay) {
+    if (reading != touchState) {
+      touchState = reading;
+
+      if (touchState == LOW) {
+        movement++;
+        Otto.sing(S_buttonPushed);
+        delay(500);
+      }
+    }
+  }
+
+  lastTouchState = reading;
+
+  switch (movement) {
+    case 1:
+      obstacleDetector();
+
+      if (obstacleDetected) {
+        Serial.println("OBJETO DETECTADO"); 
+        Otto.sing(S_OhOoh);
+
+        if (izqder) {
+          Otto.walk(2, 1000, -1);
+          Otto.turn(2, 1000, 1);
+          izqder = false;
+        } else {
+          Otto.walk(2, 1000, -1);
+          Otto.turn(2, 1000, -1);
+          izqder = true;
         }
-   }
 
-   if (movement == 2)
-   {
-      if(obstacleDetected){ 
-        Serial.println("Object detected");  
-        Otto.walk(2,1000,1);
-        Otto.home(); 
-        //delay(60);
         obstacleDetector();
-        //delay(10) ;
-        }        
-        else{ 
-            obstacleDetector(); 
-        } 
-   }
+      } else {
+        Otto.walk(1, 500, 1);
+      }
 
-   if (movement == 3)
-   {
-      Otto.jitter(10,500,40); 
-      Otto.home();
-      Otto.moonwalker(2,1000,30,1);
-      Otto.home();
-      Otto.ascendingTurn(2,500,50); 
-      Otto.home();
-      Otto.tiptoeSwing(2,1000,30); 
-      Otto.home();
-      Otto.flapping(2,500,40,1);
-      Otto.home();
-      Otto.crusaito(2,3000,40,1);
-      Otto.home();
-      Otto.shakeLeg(2,1000,1);  
-      Otto.home();
-      Otto.sing(S_disconnection);
+      break;
+
+    case 2:
+      obstacleDetector();
+
+      if (obstacleDetected) {
+        Serial.println("Object detected");
+        Otto.walk(2, 1000, 1);
+        Otto.home();
+        obstacleDetector();
+      }
+
+      break;
+
+    case 3:
+      danceRoutine();
       movement = 0;
-   }
+      break;
+
+    default:
+      break;
+  }
 }
 
-///////////////////////////////////////////////////////////////////
-//-- Function to read distance sensor & to update obstacleDetected variable
-void obstacleDetector(){
-   int distance = ultrasound();
-        if(distance<15){
-          obstacleDetected = true;
-        }else{
-          obstacleDetected = false;
-        }
+void obstacleDetector() {
+  int distance = ultrasound();
+
+  if (distance < 15) {
+    obstacleDetected = true;
+  } else {
+    obstacleDetected = false;
+  }
+}
+
+void danceRoutine() {
+  Otto.jitter(10, 500, 40);
+  Otto.home();
+  Otto.moonwalker(2, 1000, 30, 1);
+  Otto.home();
+  Otto.ascendingTurn(2, 500, 50);
+  Otto.home();
+  Otto.tiptoeSwing(2, 1000, 30);
+  Otto.home();
+  Otto.flapping(2, 500, 40, 1);
+  Otto.home();
+  Otto.crusaito(2, 3000, 40, 1);
+  Otto.home();
+  Otto.shakeLeg(2, 1000, 1);
+  Otto.home();
+  Otto.sing(S_disconnection);
 }

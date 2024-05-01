@@ -1,3 +1,10 @@
+/**
+ * @file Oscillator.h
+ * @brief This file contains the definition of the Oscillator class, which
+ * generates a sine wave and can be attached to a servo motor for physical
+ * observation.
+ */
+
 #ifndef OSCILLATOR_H_
 #define OSCILLATOR_H_
 

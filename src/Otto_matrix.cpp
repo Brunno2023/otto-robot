@@ -15,16 +15,17 @@
 #include "Otto_matrix.h"
 
 // Constructor for the Otto_Matrix class
+// Initializes member variables
 Otto_Matrix::Otto_Matrix() 
 {
-	// Initialization of member variables
-	//data = _data;
-	//load = _load;
-	//clock = _clock;
-	//num = _num;
+	data = _data;
+	load = _load;
+	clock = _clock;
+	num = _num;
 }
 
 // Initialize the MaxMatrix with given parameters
+// Checks for valid parameters before initializing
 void Otto_Matrix::init(byte _data, byte _load, byte _clock, byte _num, int _rotation)
 {
   if (_data >= 64 || _load >= 64 || _clock >= 64 || _num > 8 || (_rotation != 1 && _rotation != 2 && _rotation != 3 && _rotation != 4)) {

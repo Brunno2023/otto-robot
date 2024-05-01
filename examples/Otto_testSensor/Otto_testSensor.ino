@@ -24,6 +24,8 @@ void setup() {
   pinMode(2, OUTPUT);
 
   // Play the startup tone using the playTone function
+  // The sequence of frequencies and durations corresponds to the
+  // musical notes in the Otto DIY logo tune
   playTone(523, 125); // 523 Hz for 125 ms
   playTone(587, 125); // 587 Hz for 125 ms
   playTone(659, 125); // 659 Hz for 125 ms
@@ -74,3 +76,4 @@ void playTone(int frequency, int duration) {
   // Wait for the duration of the tone
   delay(duration);
 }
+

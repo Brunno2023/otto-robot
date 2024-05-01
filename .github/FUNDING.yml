@@ -1,6 +1,31 @@
-from typing import List, Union
-
-# A dictionary of supported funding model platforms
+# This dictionary, `funding_platforms`, contains a mapping of supported funding
+# model platforms to the corresponding platform-specific information required
+# to enable funding.
+#
+# Each key in the dictionary represents a different funding platform, and the
+# corresponding value is a list or string containing the necessary platform-
+# specific information.
+#
+# For example, the `"github"` key maps to a list of up to 4 GitHub Sponsors-
+# enabled usernames, while the `"patreon"` key maps to a single Patreon username.
+#
+# The `"custom"` key is an exception, mapping to a list of up to 4 custom
+# sponsorship URLs.
+#
+# Here is the full list of supported platforms and their corresponding
+# values:
+#
+# - "github": [<list of up to 4 GitHub Sponsors-enabled usernames>]
+# - "patreon": <single Patreon username>
+# - "open_collective": <single Open Collective username>
+# - "ko_fi": <single Ko-fi username>
+# - "tidelift": <single Tidelift platform-name/package-name>
+# - "community_bridge": <single Community Bridge project-name>
+# - "liberapay": <single Liberapay username>
+# - "issuehunt": <single IssueHunt username>
+# - "otechie": <single Otechie username>
+# - "custom": [<list of up to 4 custom sponsorship URLs>]
+#
 funding_platforms: dict[str, Union[str, List[str]]] = {
     "github": [],  # up to 4 GitHub Sponsors-enabled usernames
     "patreon": "",  # a single Patreon username

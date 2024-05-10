@@ -1,7 +1,7 @@
 # Otto DIY Robot Arduino Libraries
 
 [![License: GPL v3](https://img.shields.io/badge/License-GPLv3-blue.svg)](https://www.gnu.org/licenses/gpl-3.0)
-![version](https://img.shields.io/badge/version-13.0-blue)
+![version](https://img.shields.io/badge/version-13.0.1-blue)
 
 This repository have all the main [Otto DIY robot](https://www.ottodiy.com/) libraries for Arduino compatible boards
 
@@ -22,27 +22,21 @@ You can also find this library in the Arduino Manager as `Otto DIYLib` for quick
 
 ## Compatible Hardware
 
-- Arduino Nano
-- Arduino Uno
-- Arduino Micro
-- Arduino Mega
-- Arduino Mini
-- Arduino Leonardo
-- Arduino Nano Every
-- ESP8266
-- ESP32
+- Arduino Nano, Uno, Micro, Mega, Mini, Leonardo, Nano Every [(AVR*)](https://github.com/arduino/ArduinoCore-avr)
+- Arduino Nano Connect, Raspberry Pi Pico [(RP2040)](https://github.com/earlephilhower/arduino-pico) *using earlephilhower's arduino-pico core
+- Arduino Nano Esp32, ESP32 [(ESP32*)](https://github.com/espressif/arduino-esp32)
+- ESP8266 [(ESP8266)](https://github.com/esp8266/Arduino)
 
 ## Structure
 
 Base set of libraries for any biped robot that uses 4 motors in the legs as Otto.
 
-* `Otto.h` and `Otto.cpp` contains all the main functions
-* `Otto_gestures.h` contains all the gestures functions
-* `Otto_mouths.h` contains all the mouth functions
-* `Otto_sounds.h` contains all the sound functions
-* `Otto_matrix.h` contains all the matrix functions
-* `Oscillator.h` is the main algorithm for the servos "smooth" movement
-* `SerialCommand.c` is for Bluetooth communication vis Software serial
+- `Otto.h` and `Otto.cpp` contain all the main functions
+- `Otto_gestures.h` contains all the gestures functions
+- `Otto_mouths.h` contains all the mouth functions
+- `Otto_sounds.h` contains all the sound functions
+- `Otto_matrix.h` and `Otto_matrix.cpp` contain all the matrix functions
+- `Oscillator.h` and `Oscillator.cpp` contain the main algorithm for the servos "smooth" movement
 
 ### Adding library
 

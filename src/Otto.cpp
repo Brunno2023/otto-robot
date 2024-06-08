@@ -793,7 +793,7 @@ int Otto::Mouth_init(int DIN, int CS, int CLK, int rotate) {
     }
 	
     // Create the mouth task
-    xTaskCreate(mouthTaskWrapper, "Mouth Task", 128, this, 1, &mouthTaskHandle);
+    xTaskCreate(mouthTaskWrapper, "Mouth Task", Mouth_Stack, this, 1, &mouthTaskHandle);
 
     // Check if the task creation was successful
     if (mouthTaskHandle == NULL) {
@@ -1243,7 +1243,7 @@ void Otto::mouthTask(void *pvParameters) {
 			vTaskDelay(max (1U, (Queuemsg.cmd.setled.duration / portTICK_PERIOD_MS) ));
         } else if(Queuemsg.command == MOUTH_WRITE) { // Process StructType write
             int a, b;
-            char *originalString = Queuemsg.cmd.write.string;
+            const char *originalString = Queuemsg.cmd.write.string;
             bool continueLoop = true;
 
             // Determine the length of the text (up to 12 characters)
@@ -1349,7 +1349,7 @@ int Otto::Sound_init(int Buzzer) {
       return -2; // Failed to create queue
     }
     // Create the tone task
-    xTaskCreate(toneTaskWrapper, "Tone Task", 128, this, 1, &toneTaskHandle);
+    xTaskCreate(soundTaskWrapper, "Sound Task", Sound_Stack, this, 1, &soundTaskHandle);
 
     // Check if the task creation was successful
     if (toneTaskHandle == NULL) {
